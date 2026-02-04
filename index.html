@@ -3,83 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Will you be my Valentine?</title>
-
+    <title>Be My Valentine?</title>
     <style>
+        :root {
+            --primary-pink: #ff4d6d;
+            --soft-pink: #fff0f3;
+            --dark-pink: #c9184a;
+        }
+
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #fce4ec; /* Light pink */
-            font-family: sans-serif;
+            background-color: var(--soft-pink);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
+            overflow: hidden;
+            text-align: center;
         }
 
-        .container {
-            text-align: center;
-            position: relative;
-            width: 300px;
-            height: 200px;
+        #main-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.5s ease;
+            z-index: 10;
+        }
+
+        .gif-container img {
+            width: 150px;
+            margin-bottom: 1rem;
         }
 
         h1 {
-            color: #e91e63;
-            margin-bottom: 30px;
+            color: var(--dark-pink);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            min-height: 100px;
         }
 
         button {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin: 10px;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
             border: none;
-            border-radius: 5px;
-            transition: all 0.3s ease;
+            border-radius: 50px;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         #yesButton {
             background-color: #4CAF50;
             color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
         }
 
         #noButton {
-            background-color: #f44336;
+            background-color: var(--primary-pink);
             color: white;
             position: absolute;
+            white-space: nowrap;
+        }
+
+        /* Success State Styling */
+        .hidden { display: none !important; }
+        
+        .success-content h1 {
+            font-size: 3rem;
+            animation: heartBeat 1.2s infinite;
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .heart {
+            position: fixed;
+            top: -1vh;
+            transform: translateY(0);
+            animation: fall 3s linear forwards;
+            color: var(--primary-pink);
+            z-index: 1;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(105vh); }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Will you be my Valentine? 💖</h1>
-        <button id="yesButton">Yes</button>
-        <button id="noButton">No</button>
+    <div id="main-card">
+        <div id="question-section">
+            <div class="gif-container">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmo3N3JueXlic3p5eHh3YndmZzZ4eXN4eXN4eXN4eXN4eXN4ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/cLS1cfxvGOPVpf9g3y/giphy.gif" alt="Cute bear">
+            </div>
+            <h1>Will you be my Valentine? 💖</h1>
+            <div class="buttons">
+                <button id="yesButton">Yes</button>
+                <button id="noButton">No</button>
+            </div>
+        </div>
+
+        <div id="success-section" class="hidden">
+            <div class="gif-container">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW84cXNndXp3ZzZ4eXN4eXN4eXN4eXN4eXN4eXN4eXN4ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/K77qP26gR9x5W/giphy.gif" alt="Happy bear">
+            </div>
+            <h1 class="success-message">Yayy! I love you! ❤️💐</h1>
+        </div>
     </div>
 
     <script>
         const noButton = document.getElementById('noButton');
         const yesButton = document.getElementById('yesButton');
-        const container = document.querySelector('.container');
+        const questionSection = document.getElementById('question-section');
+        const successSection = document.getElementById('success-section');
+        
+        let yesSize = 18;
+        let noClicks = 0;
+        const noPhrases = ["Are you sure?", "Really?", "Think again!", "Last chance!", "Pretty please?", "You're breaking my heart!", "Don't do this!"];
 
-        noButton.addEventListener('mouseover', () => {
-            const containerRect = container.getBoundingClientRect();
-            const noButtonRect = noButton.getBoundingClientRect();
+        // The "Run Away" logic
+        noButton.addEventListener('mouseover', moveNoButton);
+        noButton.addEventListener('click', moveNoButton); // For mobile users
 
-            const maxX = containerRect.width - noButtonRect.width;
-            const maxY = containerRect.height - noButtonRect.height;
+        function moveNoButton() {
+            // Make the Yes button grow
+            yesSize += 10;
+            yesButton.style.fontSize = `${yesSize}px`;
+            yesButton.style.padding = `${yesSize/2}px ${yesSize}px`;
 
-            const newX = Math.random() * maxX;
-            const newY = Math.random() * maxY;
+            // Change No button text
+            if(noClicks < noPhrases.length) {
+                noButton.innerText = noPhrases[noClicks];
+                noClicks++;
+            }
 
-            noButton.style.left = `${newX}px`;
-            noButton.style.top = `${newY}px`;
-        });
+            // Move the No button
+            const x = Math.random() * (window.innerWidth - noButton.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noButton.offsetHeight);
+            
+            noButton.style.left = `${x}px`;
+            noButton.style.top = `${y}px`;
+        }
 
+        // The "Yes" logic
         yesButton.addEventListener('click', () => {
-            alert('Yay! I love you! ❤️💐');
+            questionSection.classList.add('hidden');
+            successSection.classList.remove('hidden');
+            createHearts();
         });
+
+        // Background Heart Animation
+        function createHearts() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    heart.innerHTML = '❤️';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.fontSize = Math.random() * 20 + 20 + 'px';
+                    heart.style.animationDuration = Math.random() * 2 + 3 + 's';
+                    document.body.appendChild(heart);
+                    
+                    setTimeout(() => heart.remove(), 5000);
+                }, i * 100);
+            }
+        }
     </script>
 
 </body>
